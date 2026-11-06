@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,6 +30,10 @@ scheduler = BackgroundScheduler(daemon=True)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifecycle: database verification, scheduler startup and teardown."""
+    if settings.APP_ENV == "test" or os.environ.get("APP_ENV") == "test":
+        yield
+        return
+
     logger.info(f"Starting {settings.APP_NAME} v{settings.APP_VERSION} [{settings.APP_ENV}]")
 
     # 1. Initialize & Seed DB tables if not present
@@ -62,11 +67,14 @@ async def lifespan(app: FastAPI):
 
 def create_application() -> FastAPI:
     """Application factory configuring middleware, exception handlers, and routing."""
+    app_env = os.environ.get("APP_ENV", "development")
+    active_lifespan = lifespan if app_env != "test" else None
+
     app = FastAPI(
         title=settings.APP_NAME,
         version=settings.APP_VERSION,
         description="Production-grade AI WhatsApp automation platform for clinics and hospitals.",
-        lifespan=lifespan,
+        lifespan=active_lifespan,
         docs_url="/docs",
         redoc_url="/redoc"
     )

@@ -1,0 +1,77 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clinic_ai_app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=AI-Powered Clinic Automation Platform
+      - APP_ENV=production
+      - DEBUG=False
+      - PORT=8000
+      - HOST=0.0.0.0
+      - DATABASE_URL=postgresql+psycopg2://clinic_user:clinic_secure_pass@db:5432/clinic_db
+      - WHATSAPP_PROVIDER=meta
+      - META_WA_PHONE_NUMBER_ID=${META_WA_PHONE_NUMBER_ID:-}
+      - META_WA_ACCESS_TOKEN=${META_WA_ACCESS_TOKEN:-}
+      - META_WA_VERIFY_TOKEN=${META_WA_VERIFY_TOKEN:-clinic_webhook_verify_token}
+      - META_WA_APP_SECRET=${META_WA_APP_SECRET:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
+      - SECRET_KEY=${SECRET_KEY:-clinic-super-secret-production-jwt-key-32chars}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - clinic_net
+
+  db:
+    image: postgres:16-alpine
+    container_name: clinic_postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=clinic_user
+      - POSTGRES_PASSWORD=clinic_secure_pass
+      - POSTGRES_DB=clinic_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clinic_user -d clinic_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - clinic_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: clinic_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - clinic_net
+
+volumes:
+  pgdata:
+  redisdata:
+
+networks:
+  clinic_net:
+    driver: bridge

@@ -11,7 +11,10 @@ class Settings:
     # Project metadata
     APP_NAME: str = os.getenv("APP_NAME", "AI-Powered Clinic Automation Platform")
     APP_VERSION: str = "2.0.0"
-    APP_ENV: str = os.getenv("APP_ENV", "development")
+    @property
+    def APP_ENV(self) -> str:
+        return os.getenv("APP_ENV", "development")
+
     DEBUG: bool = os.getenv("DEBUG", "True").lower() in ("true", "1", "t")
     TIMEZONE: str = os.getenv("TIMEZONE", "Asia/Kolkata")
     PORT: int = int(os.getenv("PORT", "8000"))

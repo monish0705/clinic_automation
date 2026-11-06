@@ -49,13 +49,23 @@ class WhatsAppService:
     ) -> Optional[str]:
         """
         Coordinates full inbound pipeline:
-        1. Parsing normalized payload
+        1. Parsing normalized payload according to webhook format (Meta or Twilio)
         2. Webhook event deduplication (Idempotency)
         3. Agent routing & tool calling
         4. Outbound dispatch and audit logging
         """
-        provider = get_whatsapp_provider()
-        parsed = provider.parse_incoming_webhook(raw_payload)
+        # Parse payload according to provider format
+        if provider_type == "twilio":
+            parser = TwilioWhatsAppProvider()
+            parsed = parser.parse_incoming_webhook(raw_payload)
+        else:
+            parser = MetaWhatsAppProvider()
+            parsed = parser.parse_incoming_webhook(raw_payload)
+
+        # Fallback to active provider if neither matched
+        if not parsed:
+            active = get_whatsapp_provider()
+            parsed = active.parse_incoming_webhook(raw_payload)
 
         if not parsed:
             logger.info("[WHATSAPP] Webhook contained no actionable text message (e.g. read receipt).")
