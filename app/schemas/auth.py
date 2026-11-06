@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict
 from app.models.enums import UserRole
 
 
@@ -10,7 +10,7 @@ class UserLogin(BaseModel):
 
 class UserCreate(BaseModel):
     username: str
-    email: EmailStr
+    email: str = Field(..., description="Staff email address")
     password: str
     role: UserRole = UserRole.RECEPTIONIST
     doctor_id: Optional[int] = None
