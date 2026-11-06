@@ -1,6 +1,6 @@
 # 🏥 AI-Powered Clinic Automation Platform
 
-[![CI Pipeline](https://github.com/monishmr/clinic_automation/actions/workflows/ci.yml/badge.svg)](https://github.com/monishmr/clinic_automation/actions)
+[![CI Pipeline](https://github.com/monish0705/clinic_automation/actions/workflows/ci.yml/badge.svg)](https://github.com/monish0705/clinic_automation/actions)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0+-red.svg)](https://www.sqlalchemy.org/)
@@ -210,7 +210,7 @@ Comprehensive relational model managed by Alembic:
 ### 1. Clone & Set Up Environment:
 ```powershell
 # Clone repository
-git clone https://github.com/monishmr/clinic_automation.git
+git clone https://github.com/monish0705/clinic_automation.git
 cd clinic_automation
 
 # Create and activate virtual environment
